@@ -1,0 +1,300 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <iomanip>
+#include <ctime>
+
+using namespace std;
+
+// ================= STRUCT =================
+struct Ban {
+    int soBan;
+    int trangThai; // 0: trống, 1: có khách
+};
+
+struct Mon {
+    string tenMon;
+    string size;
+    int duong;
+    int da;
+    string topping;
+    int soLuong;
+    double donGia;
+};
+
+struct Order {
+    int soBan;
+    string maHoaDon;
+    string ngay;
+    vector<Mon> dsMon;
+    string ghiChu;
+};
+
+// ================= TIỆN ÍCH =================
+string taoMaHoaDon() {
+    time_t now = time(0);
+    return "HD" + to_string(now);
+}
+
+string layNgayHienTai() {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    return to_string(1900 + ltm->tm_year) + "-" +
+           to_string(1 + ltm->tm_mon) + "-" +
+           to_string(ltm->tm_mday);
+}
+
+// ================= SƠ ĐỒ BÀN =================
+void taoDuLieuBanMacDinh(const string& tenFile) {
+    ofstream file(tenFile);
+    if (file.is_open()) {
+        for (int i = 1; i <= 10; i++) {
+            file << i << "|0" << endl;
+        }
+        file.close();
+    }
+}
+
+vector<Ban> docSoDoBan(const string& tenFile) {
+    vector<Ban> dsBan;
+    ifstream file(tenFile);
+    
+    // Nếu file chưa tồn tại thì tạo mới
+    if (!file.is_open()) {
+        taoDuLieuBanMacDinh(tenFile);
+        file.open(tenFile);
+    }
+
+    string dong;
+    while (getline(file, dong)) {
+        size_t pos = dong.find('|');
+        if (pos != string::npos) {
+            Ban b;
+            try {
+                b.soBan = stoi(dong.substr(0, pos));
+                b.trangThai = stoi(dong.substr(pos + 1));
+                dsBan.push_back(b);
+            } catch (...) {
+                continue; // Bỏ qua dòng lỗi
+            }
+        }
+    }
+    file.close();
+    return dsBan;
+}
+
+void ghiSoDoBan(const string& tenFile, const vector<Ban>& dsBan) {
+    ofstream file(tenFile); // Mở chế độ ghi đè
+    for (const auto& b : dsBan) {
+        file << b.soBan << "|" << b.trangThai << endl;
+    }
+    file.close();
+}
+
+void hienThiBan(const vector<Ban>& dsBan) {
+    cout << "\n=== TRANG THAI BAN ===\n";
+    for (const auto& b : dsBan) {
+        cout << "Ban " << setw(2) << b.soBan << ": "
+             << (b.trangThai == 1 ? "[CO KHACH]" : "[TRONG]") << endl;
+    }
+    cout << "======================\n";
+}
+
+// ================= HÓA ĐƠN =================
+void xuLyHoaDon(vector<Ban>& dsBan, int soBan) {
+    bool timThay = false;
+    for (auto& b : dsBan) {
+        if (b.soBan == soBan) {
+            timThay = true;
+            if (b.trangThai == 0) {
+                cout << "(!) Ban nay dang trong, khong the thanh toan.\n";
+                return;
+            }
+
+            double tongTien;
+            int phuongThuc;
+            char xacNhan;
+
+            cout << "\n--- HOA DON BAN " << soBan << " ---\n";
+            cout << "Nhap tong tien can thanh toan: ";
+            cin >> tongTien;
+
+            cout << "1. Tien mat\n";
+            cout << "2. Chuyen khoan\n";
+            cout << "Chon phuong thuc: ";
+            cin >> phuongThuc;
+
+            cout << "Xac nhan thanh toan? (Y/N): ";
+            cin >> xacNhan;
+
+            if (xacNhan == 'Y' || xacNhan == 'y') {
+                cout << "\n===== BIEN LAI =====\n";
+                cout << "Ban: " << soBan << endl;
+                cout << "Tong tien: " << fixed << setprecision(0) << tongTien << " VND\n";
+                cout << "Hinh thuc: " << (phuongThuc == 1 ? "Tien mat" : "Chuyen khoan") << endl;
+                cout << "Trang thai: DA THANH TOAN\n";
+                cout << "====================\n";
+
+                b.trangThai = 0; // Trả bàn về trạng thái trống
+                cout << "-> Da cap nhat trang thai ban ve 0 (Trong).\n";
+            } else {
+                cout << "-> Huy thanh toan.\n";
+            }
+            return;
+        }
+    }
+    if (!timThay) cout << "(!) Khong tim thay so ban nay.\n";
+}
+
+// ================= TẠO ORDER =================
+void taoOrderMoi(vector<Ban>& dsBan, const string& fileSoDoBan) {
+    int soBan;
+    cout << "Nhap so ban muon goi mon: ";
+    cin >> soBan;
+
+    // Kiểm tra và cập nhật trạng thái bàn
+    bool hopLe = false;
+    for (auto& b : dsBan) {
+        if (b.soBan == soBan) {
+            hopLe = true;
+            if (b.trangThai == 0) {
+                char moBan;
+                cout << "Ban dang trong. Ban co muon mo ban khong? (Y/N): ";
+                cin >> moBan;
+                if (moBan == 'Y' || moBan == 'y') {
+                    b.trangThai = 1;
+                    ghiSoDoBan(fileSoDoBan, dsBan); // Lưu ngay trạng thái mới
+                    cout << "-> Da mo ban moi.\n";
+                } else {
+                    return;
+                }
+            }
+            break;
+        }
+    }
+
+    if (!hopLe) {
+        cout << "(!) So ban khong ton tai trong he thong!\n";
+        return;
+    }
+
+    Order order;
+    order.soBan = soBan;
+    order.maHoaDon = taoMaHoaDon();
+    order.ngay = layNgayHienTai();
+
+    char tiepTuc;
+    do {
+        Mon m;
+        // Xóa bộ nhớ đệm trước khi nhập chuỗi tên món
+        cin.ignore(); 
+        cout << "\nTen mon: ";
+        getline(cin, m.tenMon);
+
+        cout << "Size (S/M/L): ";
+        cin >> m.size;
+
+        cout << "% Duong: ";
+        cin >> m.duong;
+
+        cout << "% Da: ";
+        cin >> m.da;
+
+        // Xóa bộ nhớ đệm trước khi nhập topping
+        cin.ignore();
+        cout << "Topping: ";
+        getline(cin, m.topping);
+
+        cout << "So luong: ";
+        cin >> m.soLuong;
+
+        cout << "Don gia: ";
+        cin >> m.donGia;
+
+        order.dsMon.push_back(m);
+
+        cout << "Them mon khac? (Y/N): ";
+        cin >> tiepTuc;
+
+    } while (tiepTuc == 'Y' || tiepTuc == 'y');
+
+    cin.ignore();
+    cout << "Ghi chu: ";
+    getline(cin, order.ghiChu);
+
+    // Ghi vào file Order
+    ofstream file("Order.txt", ios::app);
+    file << "MaHD:" << order.maHoaDon
+         << "|Ban:" << order.soBan
+         << "|Ngay:" << order.ngay << endl;
+
+    for (auto& m : order.dsMon) {
+        file << m.tenMon << "|"
+             << m.size << "|"
+             << m.duong << "%|"
+             << m.da << "%|"
+             << m.topping << "|"
+             << m.soLuong << "|"
+             << fixed << setprecision(0) << m.donGia << endl;
+    }
+
+    file << "GhiChu:" << order.ghiChu << endl;
+    file << "--------------------------\n";
+    file.close();
+
+    cout << "\n(OK) Tao order thanh cong! Ma HD: " << order.maHoaDon << endl;
+}
+
+// ================= MENU =================
+void hienThiMenu() {
+    cout << "\n===== MENU CAFE =====\n";
+    cout << "1. Thanh toan hoa don\n";
+    cout << "2. Goi mon (Order)\n";
+    cout << "0. Thoat\n";
+    cout << "Lua chon cua ban: ";
+}
+
+// ================= MAIN =================
+int main() {
+    string tenFile = "SoDoBan.txt";
+    // Load dữ liệu bàn ngay từ đầu
+    vector<Ban> dsBan = docSoDoBan(tenFile);
+    int luaChon;
+
+    do {
+        // Cập nhật lại màn hình hiển thị bàn sau mỗi thao tác
+        hienThiBan(dsBan);
+        hienThiMenu();
+        cin >> luaChon;
+
+        switch (luaChon) {
+            case 1: {
+                int soBan;
+                cout << "Nhap so ban thanh toan: ";
+                cin >> soBan;
+                xuLyHoaDon(dsBan, soBan);
+                ghiSoDoBan(tenFile, dsBan); // Cập nhật lại file sau khi thanh toán
+                break;
+            }
+            case 2:
+                taoOrderMoi(dsBan, tenFile);
+                break;
+            case 0:
+                cout << "Tam biet!\n";
+                break;
+            default:
+                cout << "Lua chon khong hop le!\n";
+        }
+        
+        if(luaChon != 0) {
+            cout << "\nNhan Enter de tiep tuc...";
+            cin.ignore();
+            cin.get();
+            // system("cls"); // Nếu muốn xóa màn hình thì bỏ comment dòng này (Windows)
+        }
+
+    } while (luaChon != 0);
+
+    return 0;
+}
