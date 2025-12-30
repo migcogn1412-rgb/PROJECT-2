@@ -1,0 +1,12 @@
+Hạt Dưa Rang Tay|20000|Hạt|HT01
+Hạt Điều Rang Muối|45000|Hạt|HT02
+Hạt Macca Úc|55000|Hạt|HT03
+Đậu Phộng Da Cá|15000|Hạt|HT04
+Hạt Bí Xanh|25000|Hạt|HT05
+Bánh Red Velvet|40000|Bánh ngọt|BN01
+Bánh Cheesecake Chanh|45000|Bánh ngọt|BN02
+Bánh Brownie Chocolate|35000|Bánh ngọt|BN03
+Bánh Donut Kem Trứng|25000|Bánh ngọt|BN04
+Bánh Crepe Sầu Riêng|50000|Bánh ngọt|BN05
+Nem Chua Rán|35000|Đồ mặn|DM01
+Phô Mai Que|30000|Đồ mặn|DM02

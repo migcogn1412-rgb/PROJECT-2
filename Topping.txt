@@ -1,0 +1,7 @@
+Trân châu đen|5000|TP1
+Trân châu trắn|7000|TP2
+Thạch trái cây|4000|TP3
+Kem Cheese|8000|TP4
+Thạch sương sáo|3000|TP5
+Hạt sen|10000|TP6
+Củ năng|5000|TP8

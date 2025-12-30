@@ -1,0 +1,17 @@
+Cà phê Đen Đá|25000|Cà phê|CP01
+Cà phê Sữa Đá|29000|Cà phê|CP02
+Bạc Xỉu|32000|Cà phê|CP03
+Cà phê Muối|17000|Cà phê|CP09
+Cà phê Cốt Dừa|39000|Cà phê|CP05
+Cà phê Trứng|45000|Cà phê|CP06
+Americano Đá|30000|Cà phê|CP07
+Trà Đào Cam Sả|45000|Trà|TR01
+Trà Vải Hoa Hồng|45000|Trà|TR02
+Trà Sen Vàng|50000|Trà|TR03
+Trà Tắc Mật Ong|35000|Trà|TR04
+Trà Ổi Hồng|45000|Trà|TR05
+Trà Sữa Truyền Thống|35000|Trà sữa|TS01
+Sữa Tươi Trân Châu Đường Đen|40000|Trà sữa|TS02
+Trà Sữa Oolong Nướng|42000|Trà sữa|TS03
+Trà Sữa Thái Xanh|35000|Trà sữa|TS04
+Trà Sữa Matcha|40000|Trà sữa|TS08
